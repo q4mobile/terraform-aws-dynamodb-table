@@ -49,7 +49,7 @@ variable "read_capacity" {
 variable "point_in_time_recovery_enabled" {
   description = "Whether to enable point-in-time recovery"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "ttl_enabled" {
@@ -115,7 +115,7 @@ variable "tags" {
 variable "timeouts" {
   description = "Updated Terraform resource management timeouts"
   type        = map(string)
-  default = {
+  default     = {
     create = "10m"
     update = "60m"
     delete = "10m"
@@ -131,7 +131,7 @@ variable "autoscaling_enabled" {
 variable "autoscaling_defaults" {
   description = "A map of default autoscaling settings"
   type        = map(string)
-  default = {
+  default     = {
     scale_in_cooldown  = 0
     scale_out_cooldown = 0
     target_value       = 70
@@ -172,4 +172,22 @@ variable "ignore_changes_global_secondary_index" {
   description = "Whether to ignore changes lifecycle to global secondary indices, useful for provisioned tables with scaling"
   type        = bool
   default     = false
+}
+
+variable "backup_rules" {
+  description = "The rules for the dynamodb backup event."
+  type        = any
+  default     = [
+    {
+      name                     = "midnight-daily"
+      schedule                 = "cron(0 0 * * ? *)"
+      target_vault_name        = null
+      start_window             = 60
+      completion_window        = 360
+      enable_continuous_backup = true
+      lifecycle                = {
+        delete_after = 30
+      }
+    }
+  ]
 }
